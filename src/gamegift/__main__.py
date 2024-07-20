@@ -29,16 +29,21 @@ async def main():
                 "div#modalTip div.modal-tip div.modal-content div.modal-btn-group div.modal-btn:nth-child(1)"
             )
             while True:
-                # Receive rewards
-                await loc_receive.click()
-                await loc_confirm.click()
+                try:
+                    await loc_receive.click()
+                    await loc_confirm.click(timeout=1000)
+                finally:
+                    await page.reload()
 
         tz = timezone(timedelta(hours=8))
         current_time = datetime.now(tz=tz)
         target_time = datetime.fromisoformat("2024-07-22T12:00:00+08:00")
         seconds_to_wait = max((target_time - current_time).total_seconds(), 0)
         print(f"Will wait {seconds_to_wait} seconds...")
-        await asyncio.sleep(seconds_to_wait)
+        try:
+            await asyncio.sleep(seconds_to_wait)
+        finally:
+            print("Done. starting tasks...")
 
         try:
             await asyncio.gather(*(click_receive(page) for page in pages))
